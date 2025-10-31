@@ -1,0 +1,123 @@
+name: Deploy Production
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy-prod:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+
+    environment:
+      name: production
+      url: https://www.florian-neveu.com
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_pgsql, zip, redis
+
+      - name: Install Composer dependencies
+        run: composer install --no-dev --optimize-autoloader --no-interaction
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Build frontend assets
+        run: |
+          yarn install --frozen-lockfile --production
+          yarn build
+
+      - name: Run tests
+        run: |
+          composer install --dev
+          vendor/bin/phpstan analyse
+          vendor/bin/phpunit
+
+      - name: Create deployment archive
+        run: |
+          mkdir -p deploy
+          rsync -a --exclude='deploy' --exclude='.git' --exclude='node_modules' --exclude='var/cache' --exclude='var/log' . deploy/
+          tar -czf deploy.tar.gz -C deploy .
+
+      - name: Upload to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "deploy.tar.gz"
+          target: "/tmp/"
+
+      - name: Deploy on VPS
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            set -e
+
+            DEPLOY_PATH="${{ secrets.DEPLOY_PATH_PROD }}"
+            BACKUP_DIR="${{ secrets.BACKUP_PATH }}"
+            TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+
+            echo "🚀 Déploiement en production vers $DEPLOY_PATH"
+
+            # Backup de la BDD
+            echo "💾 Backup de la base de données..."
+            docker compose -f $DEPLOY_PATH/docker/docker-compose.prod.yml --env-file $DEPLOY_PATH/.env.prod exec -T postgres pg_dump -U symfony_prod v3_prod | gzip > $BACKUP_DIR/v3-prod-$TIMESTAMP.sql.gz
+
+            # Backup du code actuel
+            echo "💾 Backup du code..."
+            tar -czf $BACKUP_DIR/v3-prod-code-$TIMESTAMP.tar.gz -C $DEPLOY_PATH .
+
+            # Backup du .env actuel
+            if [ -f "$DEPLOY_PATH/.env.prod" ]; then
+              cp "$DEPLOY_PATH/.env.prod" /tmp/.env.prod.backup
+            fi
+
+            # Extraction
+            cd $DEPLOY_PATH
+            tar -xzf /tmp/deploy.tar.gz
+            rm /tmp/deploy.tar.gz
+
+            # Restauration du .env
+            if [ -f /tmp/.env.prod.backup ]; then
+              mv /tmp/.env.prod.backup .env.prod
+            fi
+
+            # Docker Compose
+            docker compose -f docker/docker-compose.prod.yml --env-file .env.prod down
+            docker compose -f docker/docker-compose.prod.yml --env-file .env.prod up -d --build
+
+            sleep 5
+
+            # Symfony
+            docker compose -f docker/docker-compose.prod.yml --env-file .env.prod exec -T php composer install --no-dev --optimize-autoloader
+            docker compose -f docker/docker-compose.prod.yml --env-file .env.prod exec -T php php bin/console doctrine:migrations:migrate --no-interaction
+            docker compose -f docker/docker-compose.prod.yml --env-file .env.prod exec -T php php bin/console cache:clear
+            docker compose -f docker/docker-compose.prod.yml --env-file .env.prod exec -T php php bin/console cache:warmup
+
+            # Nettoyage des vieux backups (garde les 10 derniers)
+            echo "🧹 Nettoyage des vieux backups..."
+            cd $BACKUP_DIR
+            ls -t v3-prod-*.sql.gz | tail -n +11 | xargs -r rm
+            ls -t v3-prod-code-*.tar.gz | tail -n +11 | xargs -r rm
+
+            echo "✅ Déploiement en production terminé"
+
+      - name: Notification on failure
+        if: failure()
+        run: echo "❌ ÉCHEC du déploiement en production"

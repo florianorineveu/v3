@@ -1,0 +1,25 @@
+{
+  "name": "v3",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "encore dev",
+    "watch": "encore dev --watch",
+    "build": "encore production --progress",
+    "lint": "eslint assets/",
+    "lint:fix": "eslint assets/ --fix"
+  },
+  "devDependencies": {
+    "@symfony/webpack-encore": "^4.7.0",
+    "@symfony/stimulus-bridge": "^3.2.0",
+    "@hotwired/stimulus": "^3.2.0",
+    "eslint": "^8.57.0",
+    "sass": "^1.77.0",
+    "sass-loader": "^14.0.0",
+    "vue": "^3.4.0",
+    "vue-loader": "^17.4.0",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.0"
+  },
+  "dependencies": {}
+}

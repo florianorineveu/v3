@@ -1,0 +1,96 @@
+services:
+  php:
+    build:
+      context: ..
+      dockerfile: docker/php/Dockerfile
+      args:
+        USER_ID: ${USER_ID:-1000}
+        GROUP_ID: ${GROUP_ID:-1000}
+        PHP_ENV: production
+    container_name: v3_prod_php
+    volumes:
+      - ..:/var/www:cached
+    environment:
+      APP_ENV: prod
+      APP_DEBUG: 0
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      MAILER_DSN: ${MAILER_DSN}
+      APP_SECRET: ${APP_SECRET}
+      SENTRY_DSN: ${SENTRY_DSN}
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - prod
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  nginx:
+    build:
+      context: ..
+      dockerfile: docker/nginx/Dockerfile
+      args:
+        NGINX_ENV: production
+    container_name: v3_prod_nginx
+    ports:
+      - "127.0.0.1:8081:80"
+    volumes:
+      - ../public:/var/www/public:ro
+    depends_on:
+      - php
+    networks:
+      - prod
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: v3_prod_postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+      - /opt/backups/postgres:/backups  # ⬅️ Backup externe
+    networks:
+      - prod
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  redis:
+    image: redis:7-alpine
+    container_name: v3_prod_redis
+    command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes
+    volumes:
+      - redis_prod_data:/data
+    networks:
+      - prod
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  postgres_prod_data:
+  redis_prod_data:
+
+networks:
+  prod:
+    driver: bridge
