@@ -1,0 +1,155 @@
+name: Deploy Workflow (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+        description: 'Environment name (preprod or production)'
+      site_url:
+        required: false
+        type: string
+        description: 'Site URL for environment'
+      docker_compose_file:
+        required: true
+        type: string
+        description: 'Docker compose file to use'
+      nginx_port:
+        required: true
+        type: string
+        description: 'Nginx port to check health'
+    secrets:
+      SSH_HOST:
+        required: true
+      SSH_PORT:
+        required: true
+      SSH_USER:
+        required: true
+      SSH_KEY:
+        required: true
+      USER_ID:
+        required: true
+      GROUP_ID:
+        required: true
+      DEPLOY_PATH:
+        required: true
+      BACKUP_PATH:
+        required: false
+
+jobs:
+  deploy:
+    name: Deploy to ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy on VPS
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            set -e
+
+            export VOLTA_HOME="/opt/volta"
+            export PATH="$VOLTA_HOME/bin:$PATH"
+
+            DEPLOY_PATH="${{ secrets.DEPLOY_PATH }}"
+            DOCKER_COMPOSE_FILE="${{ inputs.docker_compose_file }}"
+            IS_PRODUCTION="${{ inputs.environment == 'production' }}"
+            BRANCH="${{ inputs.environment == 'production' && 'main' || 'develop' }}"
+
+            echo "🚀 Déploiement en ${{ inputs.environment }} vers $DEPLOY_PATH"
+
+            # Backup de la BDD (production uniquement)
+            if [ "$IS_PRODUCTION" = "true" ]; then
+              BACKUP_DIR="${{ secrets.BACKUP_PATH }}"
+              TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+
+              echo "💾 Backup de la base de données..."
+              docker compose -f $DEPLOY_PATH/docker/$DOCKER_COMPOSE_FILE --env-file $DEPLOY_PATH/.env.local exec -T postgres pg_dump -U symfony_prod v3_prod | gzip > $BACKUP_DIR/v3-prod-$TIMESTAMP.sql.gz || echo "⚠️  Backup BDD échoué (normal si première installation)"
+
+              echo "💾 Backup du code..."
+              tar -czf $BACKUP_DIR/v3-prod-code-$TIMESTAMP.tar.gz -C $DEPLOY_PATH . 2>/dev/null || echo "⚠️  Backup code échoué (normal si première installation)"
+            fi
+
+            # Backup du .env.local actuel
+            if [ -f "$DEPLOY_PATH/.env.local" ]; then
+              cp "$DEPLOY_PATH/.env.local" /tmp/.env.local.backup
+            fi
+
+            # Git pull pour synchroniser le code
+            cd $DEPLOY_PATH
+            echo "📥 Synchronisation du code via Git (branche: $BRANCH)..."
+            git fetch origin
+            git reset --hard origin/$BRANCH
+            git clean -fd
+
+            # Restauration du .env.local
+            if [ -f /tmp/.env.local.backup ]; then
+              mv /tmp/.env.local.backup .env.local
+            else
+              echo "⚠️  Pas de .env.local trouvé - assurez-vous d'en créer un avec les bonnes variables"
+            fi
+
+            # Injecter USER_ID et GROUP_ID dans .env.local s'ils ne sont pas déjà présents
+            if ! grep -q "USER_ID=" .env.local 2>/dev/null; then
+              echo "USER_ID=${{ secrets.USER_ID }}" >> .env.local
+            fi
+            if ! grep -q "GROUP_ID=" .env.local 2>/dev/null; then
+              echo "GROUP_ID=${{ secrets.GROUP_ID }}" >> .env.local
+            fi
+
+            # Build des assets frontend
+            echo "🎨 Build des assets frontend..."
+            yarn install --frozen-lockfile
+            yarn build
+
+            # Docker Compose
+            echo "🐳 Rebuild et démarrage des conteneurs..."
+            docker compose -f docker/$DOCKER_COMPOSE_FILE --env-file .env.local down || true
+            docker compose -f docker/$DOCKER_COMPOSE_FILE --env-file .env.local up -d --build
+
+            # Attendre que PHP soit prêt
+            echo "⏳ Attente du démarrage de PHP..."
+            sleep 5
+
+            # Commandes Symfony
+            echo "📦 Installation des dépendances Composer..."
+            docker compose -f docker/$DOCKER_COMPOSE_FILE --env-file .env.local exec -T php sh -c "APP_ENV=prod composer install --no-dev --optimize-autoloader"
+
+            echo "🗄️  Migration de la base de données..."
+            docker compose -f docker/$DOCKER_COMPOSE_FILE --env-file .env.local exec -T php php bin/console doctrine:migrations:migrate --no-interaction --env=prod
+
+            # Health check
+            echo "🏥 Vérification de la santé de l'application..."
+            sleep 2
+            docker compose -f docker/$DOCKER_COMPOSE_FILE --env-file .env.local exec -T php php bin/console about --env=prod || echo "⚠️  Health check échoué"
+
+            # Test HTTP
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:${{ inputs.nginx_port }} || echo "000")
+            if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "302" ]; then
+              echo "✅ Service HTTP répond correctement (code: $HTTP_CODE)"
+            else
+              echo "⚠️  Service HTTP ne répond pas correctement (code: $HTTP_CODE)"
+            fi
+
+            # Nettoyage des vieux backups (production uniquement, garde les 10 derniers)
+            if [ "$IS_PRODUCTION" = "true" ]; then
+              echo "🧹 Nettoyage des vieux backups..."
+              cd $BACKUP_DIR
+              ls -t v3-prod-*.sql.gz 2>/dev/null | tail -n +11 | xargs -r rm || true
+              ls -t v3-prod-code-*.tar.gz 2>/dev/null | tail -n +11 | xargs -r rm || true
+            fi
+
+            echo "✅ Déploiement en ${{ inputs.environment }} terminé"
+
+      - name: Notification on success
+        if: success()
+        run: echo "✅ Déploiement en ${{ inputs.environment }} réussi"
+
+      - name: Notification on failure
+        if: failure()
+        run: echo "❌ ÉCHEC du déploiement en ${{ inputs.environment }}"

@@ -37,9 +37,9 @@ services:
         NGINX_ENV: production
     container_name: v3_preprod_nginx
     ports:
-      - "127.0.0.1:8080:80"  # ⬅️ Bind sur localhost uniquement
+      - "127.0.0.1:8082:80"
     volumes:
-      - ../public:/var/www/public:ro  # ⬅️ Read-only en prod
+      - ../public:/var/www/public:ro
     depends_on:
       - php
     networks:
@@ -73,9 +73,40 @@ services:
   redis:
     image: redis:7-alpine
     container_name: v3_preprod_redis
-    command: redis-server --requirepass ${REDIS_PASSWORD}
+    command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes
     volumes:
       - redis_preprod_data:/data
+    networks:
+      - preprod
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  worker:
+    build:
+      context: ..
+      dockerfile: docker/php/Dockerfile
+      args:
+        USER_ID: ${USER_ID:-1000}
+        GROUP_ID: ${GROUP_ID:-1000}
+        PHP_ENV: production
+    container_name: v3_preprod_worker
+    command: php bin/console messenger:consume async --limit=100 --time-limit=3600 --memory-limit=128M
+    volumes:
+      - ..:/var/www:cached
+    environment:
+      APP_ENV: ${APP_ENV:-prod}
+      APP_DEBUG: ${APP_DEBUG:-0}
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      MAILER_DSN: ${MAILER_DSN}
+      APP_SECRET: ${APP_SECRET}
+    depends_on:
+      - postgres
+      - redis
     networks:
       - preprod
     restart: unless-stopped

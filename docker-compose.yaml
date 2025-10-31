@@ -1,1 +1,2 @@
-docker/docker-compose.yaml
+include:
+  - path: ./docker/docker-compose.yaml

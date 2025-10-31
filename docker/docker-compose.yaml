@@ -10,12 +10,6 @@ services:
     container_name: ${COMPOSE_PROJECT_NAME:-v3}_php
     volumes:
       - ..:/var/www:cached
-    environment:
-      APP_ENV: ${APP_ENV:-dev}
-      APP_DEBUG: ${APP_DEBUG:-1}
-      DATABASE_URL: ${DATABASE_URL}
-      REDIS_URL: ${REDIS_URL}
-      MAILER_DSN: ${MAILER_DSN}
     depends_on:
       - postgres
       - redis
@@ -73,6 +67,25 @@ services:
     ports:
       - "${MAILPIT_UI_PORT:-8025}:8025"
       - "${MAILPIT_SMTP_PORT:-1025}:1025"
+    networks:
+      - app
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: ..
+      dockerfile: docker/php/Dockerfile
+      args:
+        USER_ID: ${USER_ID:-1000}
+        GROUP_ID: ${GROUP_ID:-1000}
+        PHP_ENV: development
+    container_name: ${COMPOSE_PROJECT_NAME:-v3}_worker
+    command: php bin/console messenger:consume async --limit=100 --time-limit=3600 --memory-limit=128M
+    volumes:
+      - ..:/var/www:cached
+    depends_on:
+      - postgres
+      - redis
     networks:
       - app
     restart: unless-stopped

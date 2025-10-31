@@ -7,6 +7,10 @@ $finder = PhpCsFixer\Finder::create()
     ->exclude('node_modules')
     ->notPath('src/Kernel.php')
     ->notPath('tests/object-manager.php')
+    ->notPath('tests/bootstrap.php')
+    ->notPath('public/index.php')
+    ->notPath('config/preload.php')
+    ->notPath('importmap.php')
 ;
 
 return (new PhpCsFixer\Config())

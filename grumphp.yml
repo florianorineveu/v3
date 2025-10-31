@@ -6,11 +6,8 @@ grumphp:
 
         phpstan:
             configuration: phpstan.neon
-            level: 6
+            level: 9
             memory_limit: "1G"
 
-        phpunit:
-            config_file: phpunit.dist.xml
-
     git_hook_variables:
-        EXEC_GRUMPHP_COMMAND: 'docker compose exec php'
+        EXEC_GRUMPHP_COMMAND: 'docker compose exec -T php'

@@ -87,6 +87,38 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  worker:
+    build:
+      context: ..
+      dockerfile: docker/php/Dockerfile
+      args:
+        USER_ID: ${USER_ID:-1000}
+        GROUP_ID: ${GROUP_ID:-1000}
+        PHP_ENV: production
+    container_name: v3_prod_worker
+    command: php bin/console messenger:consume async --limit=100 --time-limit=3600 --memory-limit=128M
+    volumes:
+      - ..:/var/www:cached
+    environment:
+      APP_ENV: prod
+      APP_DEBUG: 0
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      MAILER_DSN: ${MAILER_DSN}
+      APP_SECRET: ${APP_SECRET}
+      SENTRY_DSN: ${SENTRY_DSN}
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - prod
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
 volumes:
   postgres_prod_data:
   redis_prod_data:

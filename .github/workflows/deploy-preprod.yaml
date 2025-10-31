@@ -1,94 +1,26 @@
 name: Deploy Preprod
 
 on:
-  push:
-    branches: [ develop ]
+  workflow_run:
+    workflows: ["CI"]
+    branches: [develop]
+    types:
+      - completed
 
 jobs:
   deploy-preprod:
-    name: Deploy to Preprod
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-          extensions: mbstring, xml, ctype, iconv, intl, pdo_pgsql, zip, redis
-
-      - name: Install Composer dependencies
-        run: composer install --no-dev --optimize-autoloader --no-interaction
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'yarn'
-
-      - name: Build frontend assets
-        run: |
-          yarn install --frozen-lockfile --production
-          yarn build
-
-      - name: Create deployment archive
-        run: |
-          mkdir -p deploy
-          rsync -a --exclude='deploy' --exclude='.git' --exclude='node_modules' --exclude='var/cache' --exclude='var/log' . deploy/
-          tar -czf deploy.tar.gz -C deploy .
-
-      - name: Upload to VPS
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          source: "deploy.tar.gz"
-          target: "/tmp/"
-
-      - name: Deploy on VPS
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          port: ${{ secrets.SSH_PORT }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            set -e
-
-            DEPLOY_PATH="${{ secrets.DEPLOY_PATH_PREPROD }}"
-            BRANCH="develop"
-
-            echo "🚀 Déploiement en pré-production vers $DEPLOY_PATH"
-
-            # Backup du .env actuel
-            if [ -f "$DEPLOY_PATH/.env.preprod" ]; then
-              cp "$DEPLOY_PATH/.env.preprod" /tmp/.env.preprod.backup
-            fi
-
-            # Extraction de l'archive
-            cd $DEPLOY_PATH
-            tar -xzf /tmp/deploy.tar.gz
-            rm /tmp/deploy.tar.gz
-
-            # Restauration du .env
-            if [ -f /tmp/.env.preprod.backup ]; then
-              mv /tmp/.env.preprod.backup .env.preprod
-            fi
-
-            # Docker Compose avec le bon fichier
-            docker compose -f docker/docker-compose.preprod.yml --env-file .env.preprod down
-            docker compose -f docker/docker-compose.preprod.yml --env-file .env.preprod up -d --build
-
-            # Attendre que PHP soit prêt
-            sleep 5
-
-            # Commandes Symfony
-            docker compose -f docker/docker-compose.preprod.yml --env-file .env.preprod exec -T php composer install --no-dev --optimize-autoloader
-            docker compose -f docker/docker-compose.preprod.yml --env-file .env.preprod exec -T php php bin/console doctrine:migrations:migrate --no-interaction
-            docker compose -f docker/docker-compose.preprod.yml --env-file .env.preprod exec -T php php bin/console cache:clear
-            docker compose -f docker/docker-compose.preprod.yml --env-file .env.preprod exec -T php php bin/console cache:warmup
-
-            echo "✅ Déploiement en pré-produdction terminé"
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      environment: preprod
+      docker_compose_file: docker-compose.preprod.yaml
+      nginx_port: "8082"
+      site_url: "http://preprod.florian-neveu.com"
+    secrets:
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_PORT: ${{ secrets.SSH_PORT }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSH_KEY: ${{ secrets.SSH_KEY }}
+      USER_ID: ${{ secrets.USER_ID }}
+      GROUP_ID: ${{ secrets.GROUP_ID }}
+      DEPLOY_PATH: ${{ secrets.DEPLOY_PATH_PREPROD }}
