@@ -342,7 +342,7 @@ Développeur full-stack passionné par la qualité du code et les performances w
 - 💻 GitHub: [@florianorineveu](https://github.com/florianorineveu)
 - 💼 LinkedIn: [in/florianorineveu](https://linkedin.com/in/florianorineveu)
 - 📸 Instagram: [@florianorineveu](https://instagram.com/florianorineveu)
-- 🦋 Bluesky: [@florianorineveu](https://bsky.app/profile/florianorineveu)
+- 🦋 Bluesky: [@florianorineveu.com](https://bsky.app/profile/florianorineveu.com)
 
 ---
 
