@@ -1,0 +1,9 @@
+:root {
+    --viewport-h: 100vh;
+    --viewport-w: 100vw;
+
+    --menu-w: 17rem;
+
+    --space-x: clamp(1rem, 2.5vw, 3rem);
+    --space-y: clamp(1rem, 2.5vw, 3rem);
+}

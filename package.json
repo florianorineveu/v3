@@ -19,18 +19,21 @@
     "@lhci/cli": "^0.13.0",
     "@symfony/stimulus-bridge": "^3.2.0",
     "@symfony/ux-turbo": "file:vendor/symfony/ux-turbo/assets",
-    "@symfony/webpack-encore": "^4.7.0",
+    "@symfony/webpack-encore": "symfony/webpack-encore",
+    "core-js": "^3.38",
     "eslint": "^8.57.0",
-    "sass": "^1.77.0",
-    "sass-loader": "^14.0.0",
+    "sass": "^1.94.2",
+    "sass-loader": "^16.0.6",
+    "ts-loader": "^9.5.4",
+    "typescript": "^5.9.3",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.0"
-  },
-  "dependencies": {
-    "core-js": "^3.38"
   },
   "volta": {
     "node": "20.19.5",
     "yarn": "1.22.22"
+  },
+  "dependencies": {
+    "@phosphor-icons/web": "^2.1.2"
   }
 }

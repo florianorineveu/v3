@@ -1,0 +1,9 @@
+{% extends 'admin/layout/base.html.twig' %}
+
+{% block body %}
+    <h1>Create new ShortUrl</h1>
+
+    {{ include('admin/short_url/_form.html.twig') }}
+
+    <a href="{{ path('admin_short_url_index') }}">back to list</a>
+{% endblock %}

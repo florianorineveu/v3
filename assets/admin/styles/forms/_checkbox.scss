@@ -1,0 +1,77 @@
+// Checkboxes personnalisées avec style doré
+input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 1.125rem;
+    height: 1.125rem;
+    border: 2px solid #cbd5e0;
+    border-radius: 0.25rem;
+    background-color: white;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease-in-out;
+    flex-shrink: 0;
+
+    // État hover
+    &:hover {
+        border-color: #eec050;
+    }
+
+    // État focus
+    &:focus {
+        outline: none;
+        border-color: #eec050;
+        box-shadow: 0 0 0 3px rgba(238, 192, 80, 0.1);
+    }
+
+    // État checked
+    &:checked {
+        background-color: #eec050;
+        border-color: #eec050;
+
+        // Icône de coche
+        &::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) rotate(45deg);
+            width: 0.25rem;
+            height: 0.5rem;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+        }
+
+        &:hover {
+            background-color: #d4a843;
+            border-color: #d4a843;
+        }
+    }
+
+    // État disabled
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+
+        &:hover {
+            border-color: #cbd5e0;
+        }
+    }
+}
+
+// Conteneur de checkbox (div/label qui contient checkbox + label)
+.login-card__checkbox,
+.checkbox-group,
+label:has(input[type="checkbox"]),
+div:has(> input[type="checkbox"]) {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    label {
+        cursor: pointer;
+        user-select: none;
+        margin: 0;
+    }
+}

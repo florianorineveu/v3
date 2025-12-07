@@ -5,6 +5,7 @@ framework:
     # Note that the session will be started ONLY if you read or write from it.
     session:
         handler_id: Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler
+        name: APP_SESSION
         cookie_secure: true
         cookie_httponly: true
         cookie_samesite: lax

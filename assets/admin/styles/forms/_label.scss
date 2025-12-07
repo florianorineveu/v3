@@ -1,0 +1,25 @@
+// Labels de formulaire
+label {
+    font-weight: 500;
+    color: #2d3748;
+    font-size: 0.875rem;
+
+    // Label requis
+    &.required::after,
+    &[aria-required="true"]::after {
+        content: ' *';
+        color: #fc8181;
+    }
+}
+
+// Groupe de champs (label + input)
+.form-field,
+.field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    label {
+        display: block;
+    }
+}

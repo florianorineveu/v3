@@ -16,6 +16,7 @@
 ###> symfony/webpack-encore-bundle ###
 /public/build/
 npm-debug.log
+/assets/vendor/
 ###< symfony/webpack-encore-bundle ###
 
 ###> Yarn / Node.js ###

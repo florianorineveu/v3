@@ -1,0 +1,31 @@
+// Composant collapsible générique
+// Utilisé avec le contrôleur Stimulus collapsible_controller.ts
+
+[data-collapsible-target="content"] {
+    &[data-state="closed"] {
+        display: none;
+    }
+
+    &[data-state="open"] {
+        display: block;
+    }
+}
+
+// Animation optionnelle (décommenter si souhaité)
+// [data-collapsible-target="content"] {
+//     transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+//     transform-origin: top;
+//
+//     &[data-state="closed"] {
+//         opacity: 0;
+//         transform: scaleY(0);
+//         max-height: 0;
+//         overflow: hidden;
+//     }
+//
+//     &[data-state="open"] {
+//         opacity: 1;
+//         transform: scaleY(1);
+//         max-height: 500px;
+//     }
+// }

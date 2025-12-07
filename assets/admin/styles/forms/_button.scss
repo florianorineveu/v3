@@ -1,0 +1,101 @@
+// Boutons personnalisés
+button,
+.btn {
+    padding: 0.875rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none !important;
+    }
+}
+
+// Bouton primary (doré)
+button[type="submit"],
+.btn-primary {
+    background: linear-gradient(135deg, #eec050 0%, #d4a843 100%);
+    color: white;
+
+    &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(238, 192, 80, 0.3);
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0);
+    }
+}
+
+// Bouton secondary
+.btn-secondary {
+    background: #718096;
+    color: white;
+
+    &:hover:not(:disabled) {
+        background: #4a5568;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(113, 128, 150, 0.3);
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0);
+    }
+}
+
+// Bouton outline
+.btn-outline {
+    background: transparent;
+    border: 2px solid #eec050;
+    color: #eec050;
+
+    &:hover:not(:disabled) {
+        background: #eec050;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(238, 192, 80, 0.2);
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0);
+    }
+}
+
+// Bouton danger
+.btn-danger {
+    background: #fc8181;
+    color: white;
+
+    &:hover:not(:disabled) {
+        background: #f56565;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(252, 129, 129, 0.3);
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0);
+    }
+}
+
+// Tailles de boutons
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+}
+
+.btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+}

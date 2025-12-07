@@ -1,0 +1,40 @@
+:where(*) {
+    margin: 0;
+    padding: 0;
+
+    &, &:before, &:after {
+        box-sizing: border-box;
+    }
+}
+
+:where(h1, h2, h3, h4, h5, h6) {
+    font-weight: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+:where(button, input, select, textarea) {
+    border:0;
+    border-radius:0;
+    background-color: transparent;
+    appearance: none;
+    font-weight: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+:where(a, button, input, select, textarea) {
+    color: inherit;
+}
+
+:where(a, button) {
+    cursor: pointer;
+}
+
+:where(ul, ol) {
+    li {
+        list-style-type: none;
+    }
+}

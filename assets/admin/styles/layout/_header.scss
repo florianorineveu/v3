@@ -1,0 +1,36 @@
+#main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .5rem;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+
+    ul {
+        display: flex;
+        gap: .5rem;
+
+        a {
+            text-decoration: none;
+        }
+
+        div {
+            position: absolute;
+            right: 0;
+
+            ul {
+                flex-direction: column;
+            }
+        }
+    }
+
+    form {
+        input {
+            background: none;
+            border: none;
+
+            &[type='submit'] {
+                display: none;
+            }
+        }
+    }
+}

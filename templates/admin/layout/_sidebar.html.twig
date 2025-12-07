@@ -1,0 +1,71 @@
+<aside id="sidebar">
+    <header>
+        IO
+    </header>
+
+    <nav>
+        <ul>
+            <li class="{{ app.current_route starts with 'admin_dashboard_' ? 'active' }}">
+                <a href="{{ path('admin_dashboard_index') }}">
+                    <i class="ph ph-house-line"></i>
+                    Accueil
+                </a>
+            </li>
+
+            <li class="{{ app.current_route starts with 'admin_project_' ? 'active' }}">
+                <a href="{{ path('admin_project_index') }}">
+                    <i class="ph ph-projector-screen-chart"></i>
+                    Projets
+                </a>
+            </li>
+
+            <li class="{{ app.current_route starts with 'admin_projects_' ? 'active' }}">
+                <a href="{{ path('admin_short_url_index') }}">
+                    <i class="ph ph-article-ny-times"></i>
+                    Articles
+                </a>
+            </li>
+
+            <li class="{{ app.current_route starts with 'admin_projects_' ? 'active' }}">
+                <a href="{{ path('admin_short_url_index') }}">
+                    <i class="ph ph-file"></i>
+                    Pages
+                </a>
+            </li>
+
+            <li class="separator"></li>
+
+            <li class="{{ app.current_route starts with 'admin_projects_' ? 'active' }}">
+                <a href="{{ path('admin_short_url_index') }}">
+                    <i class="ph ph-clock"></i>
+                    Page Now
+                </a>
+            </li>
+
+            <li class="{{ app.current_route starts with 'admin_projects_' ? 'active' }}">
+                <a href="{{ path('admin_short_url_index') }}">
+                    <i class="ph ph-toolbox"></i>
+                    Page Uses
+                </a>
+            </li>
+
+            <li class="separator"></li>
+
+            <li class="{{ app.current_route starts with 'admin_short_url_' ? 'active' }}">
+                <a href="{{ path('admin_short_url_index') }}">
+                    <i class="ph ph-arrow-u-down-right"></i>
+                    Redirections
+                </a>
+            </li>
+
+            <li class="separator"></li>
+
+            <li class="{{ app.current_route starts with 'admin_admin_' ? 'active' }}">
+                <a href="{{ path('admin_short_url_index') }}">
+                    <i class="ph ph-users"></i>
+                    Administrateurs
+                </a>
+            </li>
+        </ul>
+    </nav>
+</aside>

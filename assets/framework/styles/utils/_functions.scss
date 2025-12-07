@@ -1,0 +1,29 @@
+@use 'sass:math';
+
+@function get-unit($value) {
+    @return str-slice($value * 0 + '', 2, -1);
+}
+
+@function strip-unit($value) {
+    @if type-of($value) == 'number' and not unitless($value) {
+        @return math.div($value, ($value * 0 + 1));
+    }
+
+    @return $value;
+}
+
+@function responsive-clamp($min, $max) {
+    $var: '';
+
+    @if $min == $max {
+        @return $min;
+    }
+
+    @if get-unit($max) == 'px' {
+        $var: math.div(strip-unit($max), 1440);
+    } @else {
+        $var: math.div(strip-unit($max) * 16, 1440);
+    }
+
+    @return clamp($min, $var * 100vw + .5rem, $max);
+}
