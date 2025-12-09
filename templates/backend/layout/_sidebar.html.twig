@@ -1,0 +1,78 @@
+<aside id="sidebar">
+    <header>
+        IO
+    </header>
+
+    <nav>
+        <ul>
+            <li class="{{ app.current_route starts with 'backend_dashboard_' ? 'active' }}">
+                <a href="{{ path('backend_dashboard_index') }}">
+                    <i class="ph ph-house-line"></i>
+                    Accueil
+                </a>
+            </li>
+
+            <li class="{{ app.current_route starts with 'backend_project_' ? 'active' }}">
+                <a href="{{ path('backend_project_index') }}">
+                    <i class="ph ph-projector-screen-chart"></i>
+                    Projets
+                </a>
+            </li>
+
+            <li class="{{ app.current_route starts with 'backend_blog_category_' ? 'active' }}">
+                <a href="{{ path('backend_blog_category_index') }}">
+                    <i class="ph ph-article-ny-times"></i>
+                    Rubriques
+                </a>
+            </li>
+
+            <li class="{{ app.current_route starts with 'backend_blog_post_' ? 'active' }}">
+                <a href="{{ path('backend_blog_post_index') }}">
+                    <i class="ph ph-article-ny-times"></i>
+                    Articles
+                </a>
+            </li>
+
+            <li class="{{ app.current_route starts with 'backend_projects_' ? 'active' }}">
+                <a href="{{ path('backend_short_url_index') }}">
+                    <i class="ph ph-file"></i>
+                    Pages
+                </a>
+            </li>
+
+            <li class="separator"></li>
+
+            <li class="{{ app.current_route starts with 'backend_projects_' ? 'active' }}">
+                <a href="{{ path('backend_short_url_index') }}">
+                    <i class="ph ph-clock"></i>
+                    Page Now
+                </a>
+            </li>
+
+            <li class="{{ app.current_route starts with 'backend_projects_' ? 'active' }}">
+                <a href="{{ path('backend_short_url_index') }}">
+                    <i class="ph ph-toolbox"></i>
+                    Page Uses
+                </a>
+            </li>
+
+            <li class="separator"></li>
+
+            <li class="{{ app.current_route starts with 'backend_short_url_' ? 'active' }}">
+                <a href="{{ path('backend_short_url_index') }}">
+                    <i class="ph ph-arrow-u-down-right"></i>
+                    Redirections
+                </a>
+            </li>
+
+            <li class="separator"></li>
+
+            <li class="{{ app.current_route starts with 'backend_backend_' ? 'active' }}">
+                <a href="{{ path('backend_short_url_index') }}">
+                    <i class="ph ph-users"></i>
+                    Administrateurs
+                </a>
+            </li>
+        </ul>
+    </nav>
+</aside>

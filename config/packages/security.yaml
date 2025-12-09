@@ -21,9 +21,9 @@ security:
             provider: app_admin_provider
             user_checker: App\Security\AdminUserChecker
             form_login:
-                login_path: admin_security_login
-                check_path: admin_security_login
-                default_target_path: admin_dashboard_index
+                login_path: backend_security_login
+                check_path: backend_security_login
+                default_target_path: backend_dashboard_index
                 always_use_default_target_path: false
                 enable_csrf: true
             logout:

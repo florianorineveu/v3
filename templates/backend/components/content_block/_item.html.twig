@@ -1,0 +1,137 @@
+{#
+ # Content Block Item
+ # A single content block with its form fields, actions, and type-specific visibility.
+ #
+ # @param form - The form for this block
+ # @param index - The index in the collection
+ #}
+
+{% set block_type = form.type.vars.value|default('text') %}
+
+<div class="content-block"
+     data-controller="content-block-item"
+     data-content-block-item-type-value="{{ block_type }}"
+     data-content-block-collection-target="item"
+     data-index="{{ index }}">
+
+    {# Block header with type indicator and actions #}
+    <div class="content-block__header">
+        <div class="content-block__drag-handle" data-action="mousedown->content-block-collection#startDrag">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <circle cx="5" cy="4" r="1.5"/>
+                <circle cx="11" cy="4" r="1.5"/>
+                <circle cx="5" cy="8" r="1.5"/>
+                <circle cx="11" cy="8" r="1.5"/>
+                <circle cx="5" cy="12" r="1.5"/>
+                <circle cx="11" cy="12" r="1.5"/>
+            </svg>
+        </div>
+
+        <div class="content-block__type-badge content-block__type-badge--{{ block_type }}"
+             data-content-block-item-target="typeBadge">
+            {{ form.type.vars.choices|filter(c => c.value == block_type)|first.label|default(block_type|capitalize) }}
+        </div>
+
+        <div class="content-block__actions">
+            <button type="button"
+                    class="content-block__action content-block__action--up"
+                    data-action="content-block-collection#moveUp"
+                    title="Monter">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M8 4l5 5H3l5-5z"/>
+                </svg>
+            </button>
+            <button type="button"
+                    class="content-block__action content-block__action--down"
+                    data-action="content-block-collection#moveDown"
+                    title="Descendre">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M8 12l-5-5h10l-5 5z"/>
+                </svg>
+            </button>
+            <button type="button"
+                    class="content-block__action content-block__action--delete"
+                    data-action="content-block-collection#removeBlock"
+                    title="Supprimer">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M4.5 3l1-1h5l1 1H14v1H2V3h2.5zM3 5h10v9a1 1 0 01-1 1H4a1 1 0 01-1-1V5zm3 2v6h1V7H6zm3 0v6h1V7H9z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    {# Block body with all form fields #}
+    <div class="content-block__body">
+        {# Hidden fields (type is set via JS when adding a block) #}
+        <div class="d-none">
+            {{ form_widget(form.type) }}
+            {{ form_widget(form.position) }}
+        </div>
+
+        {# TEXT block fields #}
+        <div class="content-block__fields" data-content-block-item-target="fields" data-block-type="text">
+            {{ form_row(form.content) }}
+        </div>
+
+        {# CODE block fields #}
+        <div class="content-block__fields" data-content-block-item-target="fields" data-block-type="code">
+            <div class="content-block__row content-block__row--2cols">
+                {{ form_row(form.language) }}
+                {{ form_row(form.filename) }}
+            </div>
+            {{ form_row(form.code) }}
+        </div>
+
+        {# QUOTE block fields #}
+        <div class="content-block__fields" data-content-block-item-target="fields" data-block-type="quote">
+            {{ form_row(form.quoteText) }}
+            <div class="content-block__row content-block__row--2cols">
+                {{ form_row(form.quoteAuthor) }}
+                {{ form_row(form.quoteSource) }}
+            </div>
+        </div>
+
+        {# CALLOUT block fields #}
+        <div class="content-block__fields" data-content-block-item-target="fields" data-block-type="callout">
+            <div class="content-block__row content-block__row--2cols">
+                {{ form_row(form.calloutType) }}
+                {{ form_row(form.calloutTitle) }}
+            </div>
+            {{ form_row(form.calloutContent) }}
+        </div>
+
+        {# DIVIDER block fields #}
+        <div class="content-block__fields" data-content-block-item-target="fields" data-block-type="divider">
+            {{ form_row(form.dividerStyle) }}
+        </div>
+
+        {#
+         # Future block types - commented out to avoid rendering issues
+         # These will be enabled when their features are implemented
+         #}
+
+        {# Render remaining form fields that aren't displayed (to avoid Symfony form errors) #}
+        <div class="d-none">
+            {{ form_row(form.imageCaption) }}
+            {{ form_row(form.imageAlt) }}
+            {{ form_row(form.imageAlignment) }}
+            {{ form_row(form.galleryLayout) }}
+            {{ form_row(form.galleryColumns) }}
+            {{ form_row(form.buttonText) }}
+            {{ form_row(form.buttonUrl) }}
+            {{ form_row(form.buttonStyle) }}
+            {{ form_row(form.buttonAlignment) }}
+            {{ form_row(form.metricValue) }}
+            {{ form_row(form.metricLabel) }}
+            {{ form_row(form.metricPrefix) }}
+            {{ form_row(form.metricSuffix) }}
+            {{ form_row(form.internalLinkDisplay) }}
+            {{ form_row(form.internalLinkCustomText) }}
+            {{ form_row(form.relatedPost) }}
+            {{ form_row(form.relatedProject) }}
+            {{ form_row(form.relatedTitle) }}
+            {{ form_row(form.relatedPosts) }}
+            {{ form_row(form.relatedProjects) }}
+        </div>
+    </div>
+</div>

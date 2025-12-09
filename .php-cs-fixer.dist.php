@@ -63,6 +63,11 @@ return (new PhpCsFixer\Config())
         'phpdoc_align' => ['align' => 'left'],
         'phpdoc_order' => true,
         'phpdoc_trim' => true,
+        // Préserve les PHPDoc avec annotations génériques (@extends, @implements, @template, etc.)
+        'no_superfluous_phpdoc_tags' => [
+            'allow_mixed' => true,
+            'remove_inheritdoc' => false,
+        ],
     ])
     ->setFinder($finder)
     ->setRiskyAllowed(true)

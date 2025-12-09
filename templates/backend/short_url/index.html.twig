@@ -1,0 +1,45 @@
+{% extends 'backend/layout/base.html.twig' %}
+
+{% block body %}
+    <h1>ShortUrl index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Url</th>
+                <th>ShortenUrl</th>
+                <th>Enabled</th>
+                <th>Used</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for short_url in short_urls %}
+            <tr>
+                <td>{{ short_url.id }}</td>
+                <td>{{ short_url.name }}</td>
+                <td>{{ short_url.url }}</td>
+                <td>{{ short_url.slug }}</td>
+                <td>{{ short_url.enabled ? 'Yes' : 'No' }}</td>
+                <td>{{ short_url.used }}</td>
+                <td>{{ short_url.createdAt ? short_url.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ short_url.updatedAt ? short_url.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('backend_short_url_show', {'id': short_url.id}) }}">show</a>
+                    <a href="{{ path('backend_short_url_edit', {'id': short_url.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="9">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('backend_short_url_new') }}">Create new</a>
+{% endblock %}

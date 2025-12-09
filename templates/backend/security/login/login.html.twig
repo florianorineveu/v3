@@ -1,0 +1,52 @@
+{% extends 'backend/layout/base_guest.html.twig' %}
+
+{% block title %}Connexion - IO{% endblock %}
+
+{% block body %}
+    <div class="login-card">
+        <div class="login-card__header">
+            <h1>IO</h1>
+        </div>
+
+        {% if error %}
+            <div class="login-card__error">
+                {{ error.messageKey|trans(error.messageData, 'security') }}
+            </div>
+        {% endif %}
+
+        <form action="{{ path('backend_security_login') }}" method="post" class="login-card__form">
+            <div class="login-card__field">
+                <label for="username">Adresse e-mail</label>
+                <input type="email" id="username" name="_username" value="{{ last_username }}" required autofocus>
+            </div>
+
+            <div class="login-card__field">
+                <label for="password">Mot de passe</label>
+                <div class="password-field" data-controller="password-toggle">
+                    <input type="password"
+                           id="password"
+                           name="_password"
+                           class="password-input"
+                           data-password-toggle-target="input"
+                           required>
+                    <button type="button"
+                            class="password-field__toggle"
+                            data-password-toggle-target="button"
+                            data-action="click->password-toggle#toggle"
+                            aria-label="Afficher le mot de passe">
+                        <i class="ph ph-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="login-card__checkbox">
+                <input type="checkbox" id="remember_me" name="_remember_me" checked>
+                <label for="remember_me">Se souvenir de moi</label>
+            </div>
+
+            <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+
+            <button type="submit" class="login-card__submit">Se connecter</button>
+        </form>
+    </div>
+{% endblock %}

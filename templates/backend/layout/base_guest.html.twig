@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}IO{% endblock %}</title>
+
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('admin') }}
+    {% endblock %}
+
+    {% block javascripts %}
+        {{ encore_entry_script_tags('admin') }}
+    {% endblock %}
+</head>
+<body class="guest-layout">
+    <main class="guest-content">
+        {% block body %}{% endblock %}
+    </main>
+
+    {{ include('backend/layout/_footer.html.twig') }}
+</body>
+</html>

@@ -1,13 +1,17 @@
 grumphp:
     tasks:
-        phpcsfixer:
-            config: .php-cs-fixer.dist.php
-            allow_risky: true
-
         phpstan:
             configuration: phpstan.neon
             level: 9
             memory_limit: "1G"
+            metadata:
+                priority: 100
+
+        phpcsfixer:
+            config: .php-cs-fixer.dist.php
+            allow_risky: true
+            metadata:
+                priority: 50
 
     git_hook_variables:
         EXEC_GRUMPHP_COMMAND: 'docker compose exec -T php'

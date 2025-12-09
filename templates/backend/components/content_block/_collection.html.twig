@@ -1,0 +1,62 @@
+{#
+ # Content Block Collection
+ # Container for managing a collection of content blocks with drag-and-drop ordering.
+ #
+ # Usage:
+ # {{ include('backend/components/content_block/_collection.html.twig', {
+ #     form: form.contentBlocks,
+ #     available_types: content_block_manager.getMvpTypes()
+ # }) }}
+ #}
+
+{% set available_types = available_types|default({
+    'text': 'Texte enrichi',
+    'code': 'Code',
+    'quote': 'Citation',
+    'callout': 'Encadré',
+    'divider': 'Séparateur'
+}) %}
+
+<div class="content-blocks"
+     data-controller="content-block-collection"
+     data-content-block-collection-prototype-value="{{ form.vars.prototype is defined ? form.vars.prototype.vars.name : '__block_name__' }}">
+
+    {# Toolbar: Add block buttons #}
+    <div class="content-blocks__toolbar" data-content-block-collection-target="toolbar">
+        <span class="content-blocks__toolbar-label">Ajouter un bloc :</span>
+        {% for type, label in available_types %}
+            <button type="button"
+                    class="content-blocks__add-btn content-blocks__add-btn--{{ type }}"
+                    data-action="content-block-collection#addBlock"
+                    data-type="{{ type }}">
+                {{ label }}
+            </button>
+        {% endfor %}
+    </div>
+
+    {# Blocks container #}
+    <div class="content-blocks__list"
+         data-content-block-collection-target="list">
+
+        {% for block in form %}
+            {{ include('backend/components/content_block/_item.html.twig', {
+                form: block,
+                index: loop.index0
+            }) }}
+        {% else %}
+            <div class="content-blocks__empty" data-content-block-collection-target="empty">
+                Aucun bloc de contenu. Utilisez les boutons ci-dessus pour en ajouter.
+            </div>
+        {% endfor %}
+    </div>
+
+    {# Prototype for JavaScript #}
+    {% if form.vars.prototype is defined %}
+        <template data-content-block-collection-target="prototype">
+            {{ include('backend/components/content_block/_item.html.twig', {
+                form: form.vars.prototype,
+                index: '__block_name__'
+            }) }}
+        </template>
+    {% endif %}
+</div>

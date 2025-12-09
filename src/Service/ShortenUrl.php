@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Repository\ShortUrlRepository;
+use App\Repository\Tool\ShortUrlRepository;
 
 class ShortenUrl
 {

@@ -1,0 +1,11 @@
+{% extends 'backend/layout/base.html.twig' %}
+
+{% block body %}
+    <h1>Edit Category</h1>
+
+    {{ include('backend/blog/category/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('backend_blog_category_index') }}">back to list</a>
+
+    {{ include('backend/blog/category/_delete_form.html.twig') }}
+{% endblock %}

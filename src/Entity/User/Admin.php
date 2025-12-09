@@ -12,8 +12,9 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: AdminRepository::class)]
-#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
-#[ORM\Index(name: 'IDX_ADMIN_ACTIVE', columns: ['active'])]
+#[ORM\Table(name: 'user_admin')]
+#[ORM\UniqueConstraint(name: 'uniq_user_admin_email', fields: ['email'])]
+#[ORM\Index(name: 'idx_user_admin_active', columns: ['active'])]
 #[ORM\HasLifecycleCallbacks]
 class Admin implements UserInterface, PasswordAuthenticatedUserInterface
 {

@@ -1,0 +1,9 @@
+{% extends 'backend/layout/base.html.twig' %}
+
+{% block body %}
+    <h1>Create new Project</h1>
+
+    {{ include('backend/project/_form.html.twig') }}
+
+    <a href="{{ path('backend_project_index') }}">back to list</a>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'backend/layout/base.html.twig' %}
+
+{% block body %}
+    <h1>Edit Post</h1>
+
+    {{ include('backend/content/blog_post/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('backend_blog_post_index') }}">back to list</a>
+
+    {{ include('backend/content/blog_post/_delete_form.html.twig') }}
+{% endblock %}

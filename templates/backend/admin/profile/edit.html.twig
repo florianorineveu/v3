@@ -1,0 +1,16 @@
+{% extends 'backend/layout/base.html.twig' %}
+
+{% block title -%}
+    Edition du profil utilisateur - {{ parent() }}
+{%- endblock title %}
+
+{% block body %}
+    <h1>
+        Edition du profil utilisateur
+    </h1>
+
+    <div>
+        {{ form(profile_form) }}
+        {{ form(password_form) }}
+    </div>
+{% endblock body %}

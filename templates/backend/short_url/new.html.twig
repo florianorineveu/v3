@@ -1,0 +1,9 @@
+{% extends 'backend/layout/base.html.twig' %}
+
+{% block body %}
+    <h1>Create new ShortUrl</h1>
+
+    {{ include('backend/short_url/_form.html.twig') }}
+
+    <a href="{{ path('backend_short_url_index') }}">back to list</a>
+{% endblock %}
