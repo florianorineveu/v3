@@ -9,6 +9,7 @@ if (!isset($_SERVER['APP_ENV'])) {
     (new Dotenv())->bootEnv(__DIR__ . '/../.env');
 }
 
+/** @var string $env */
 $env = $_SERVER['APP_ENV'] ?? 'test';
 $debug = (bool) ($_SERVER['APP_DEBUG'] ?? true);
 

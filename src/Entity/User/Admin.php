@@ -12,8 +12,9 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: AdminRepository::class)]
-#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
-#[ORM\Index(name: 'IDX_ADMIN_ACTIVE', columns: ['active'])]
+#[ORM\Table(name: 'user_admin')]
+#[ORM\UniqueConstraint(name: 'uniq_user_admin_email', fields: ['email'])]
+#[ORM\Index(name: 'idx_user_admin_email_active_locked_until', columns: ['email', 'active', 'locked_until'])]
 #[ORM\HasLifecycleCallbacks]
 class Admin implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -93,6 +94,8 @@ class Admin implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
+        \assert('' !== $this->email && null !== $this->email);
+
         return (string) $this->email;
     }
 
@@ -139,7 +142,7 @@ class Admin implements UserInterface, PasswordAuthenticatedUserInterface
     public function __serialize(): array
     {
         $data = (array) $this;
-        $data["\0" . self::class . "\0password"] = hash('crc32c', $this->password);
+        $data["\0" . self::class . "\0password"] = hash('crc32c', $this->password ?? '');
 
         return $data;
     }
@@ -238,7 +241,7 @@ class Admin implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function incrementFailedLoginAttempts(int $maxAttempts = 5, int $lockDurationMinutes = 15): void
     {
-        $this->failedLoginAttempts++;
+        ++$this->failedLoginAttempts;
         $this->lastFailedLoginAt = new \DateTimeImmutable();
 
         if ($this->failedLoginAttempts >= $maxAttempts) {
@@ -249,8 +252,8 @@ class Admin implements UserInterface, PasswordAuthenticatedUserInterface
     public function resetFailedLoginAttempts(): void
     {
         $this->failedLoginAttempts = 0;
-        $this->lastFailedLoginAt   = null;
-        $this->lockedUntil         = null;
+        $this->lastFailedLoginAt = null;
+        $this->lockedUntil = null;
     }
 
     public function recordSuccessfulLogin(string $ipAddress): void

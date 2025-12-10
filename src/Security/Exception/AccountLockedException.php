@@ -27,6 +27,9 @@ class AccountLockedException extends AccountStatusException
         return 'Account locked due to too many failed login attempts.';
     }
 
+    /**
+     * @return array<string, string|null>
+     */
     public function getMessageData(): array
     {
         return [

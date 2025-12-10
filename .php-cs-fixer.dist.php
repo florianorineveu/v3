@@ -10,6 +10,7 @@ $finder = PhpCsFixer\Finder::create()
     ->notPath('tests/bootstrap.php')
     ->notPath('public/index.php')
     ->notPath('config/preload.php')
+    ->notPath('config/bundles.php')
     ->notPath('importmap.php')
 ;
 
@@ -26,9 +27,9 @@ return (new PhpCsFixer\Config())
         'single_import_per_statement' => true,
         'blank_line_between_import_groups' => true,
         'no_unused_imports' => true,
-        'not_operator_with_successor_space' => true,
+        'not_operator_with_successor_space' => false,
         'trailing_comma_in_multiline' => [
-            'elements' => ['arrays', 'arguments', 'parameters'],
+            'elements' => ['arrays'],
         ],
         'concat_space' => [
             'spacing' => 'one',
@@ -63,6 +64,10 @@ return (new PhpCsFixer\Config())
         'phpdoc_align' => ['align' => 'left'],
         'phpdoc_order' => true,
         'phpdoc_trim' => true,
+        'no_superfluous_phpdoc_tags' => [
+            'allow_mixed' => true,
+            'remove_inheritdoc' => false,
+        ],
     ])
     ->setFinder($finder)
     ->setRiskyAllowed(true)

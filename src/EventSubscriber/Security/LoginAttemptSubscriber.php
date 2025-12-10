@@ -18,7 +18,8 @@ class LoginAttemptSubscriber implements EventSubscriberInterface
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly RequestStack $requestStack
-    ) {}
+    ) {
+    }
 
     public static function getSubscribedEvents(): array
     {
@@ -37,7 +38,7 @@ class LoginAttemptSubscriber implements EventSubscriberInterface
         }
 
         $request = $this->requestStack->getCurrentRequest();
-        $ipAddress = $request?->getClientIp();
+        $ipAddress = $request?->getClientIp() ?? 'unknown';
 
         $user->recordSuccessfulLogin($ipAddress);
 
@@ -52,8 +53,8 @@ class LoginAttemptSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $userBadge = $passport?->getBadge(UserBadge::class);
-        $user      = $userBadge?->getUser();
+        $userBadge = $passport->getBadge(UserBadge::class);
+        $user = $userBadge?->getUser();
 
         if (!$user instanceof Admin) {
             return;
@@ -65,7 +66,7 @@ class LoginAttemptSubscriber implements EventSubscriberInterface
 
         if ($user->isLocked()) {
             throw new CustomUserMessageAuthenticationException(
-                sprintf(
+                \sprintf(
                     'Your account has been locked until %s due to too many failed login attempts.',
                     $user->getLockedUntil()?->format('d/m/Y H:i:s')
                 )

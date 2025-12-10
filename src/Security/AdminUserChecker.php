@@ -26,7 +26,7 @@ class AdminUserChecker implements UserCheckerInterface
         if ($user->isLocked()) {
             throw new AccountLockedException(
                 lockedUntil: $user->getLockedUntil(),
-                message: sprintf(
+                message: \sprintf(
                     'Your account has been locked until %s due to too many failed login attempts.',
                     $user->getLockedUntil()?->format('Y-m-d H:i:s')
                 )

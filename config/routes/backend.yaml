@@ -1,0 +1,6 @@
+backend:
+    resource:
+        path: ../../src/Controller/Backend/
+        namespace: App\Controller\Backend
+    type: attribute
+    prefix: /io

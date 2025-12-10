@@ -1,0 +1,10 @@
+tool:
+    short_url:
+        type:
+            label:
+                name: "Nom"
+                url: "URL"
+                slug: "Slug"
+                enabled: "Activée"
+            help:
+                slug: "Non obligatoire"

@@ -1,0 +1,9 @@
+{% extends 'backend/layout/base.html.twig' %}
+
+{% block title -%}
+    Tableau de bord - {{ parent() }}
+{%- endblock title %}
+
+{% block body %}
+    <h1 style="padding: 1.5rem; font-size: 2rem; font-weight: bold">Bonjour {{ app.user.fullName }}</h1>
+{% endblock body %}

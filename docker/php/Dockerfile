@@ -18,7 +18,6 @@ RUN docker-php-ext-install \
     mbstring \
     zip
 
-# Install Redis and APCu via PECL
 RUN apk add --no-cache $PHPIZE_DEPS \
     && pecl install redis apcu \
     && docker-php-ext-enable redis apcu \
@@ -26,13 +25,12 @@ RUN apk add --no-cache $PHPIZE_DEPS \
 
 ARG PHP_ENV=development
 
-# Install Xdebug only in development
-#RUN if [ "$PHP_ENV" = "development" ]; then \
-#    apk add --no-cache $PHPIZE_DEPS linux-headers \
-#    && pecl install xdebug \
-#    && docker-php-ext-enable xdebug \
-#    && apk del $PHPIZE_DEPS linux-headers; \
-#    fi
+RUN if [ "$PHP_ENV" = "development" ]; then \
+    apk add --no-cache $PHPIZE_DEPS linux-headers \
+    && pecl install xdebug \
+    && docker-php-ext-enable xdebug \
+    && apk del $PHPIZE_DEPS linux-headers; \
+    fi
 
 COPY docker/php/php.${PHP_ENV}.ini /usr/local/etc/php/conf.d/custom.ini
 COPY docker/php/xdebug.ini /usr/local/etc/php/conf.d/xdebug-custom.ini
